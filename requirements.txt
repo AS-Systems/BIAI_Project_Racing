@@ -1,0 +1,6 @@
+gymnasium[all]
+torch>=2.7.0
+numpy>=2.2.5
+opencv-python>=4.11.0
+matplotlib>=3.10.3
+pygame>=2.6.1
