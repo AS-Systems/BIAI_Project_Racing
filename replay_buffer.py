@@ -6,11 +6,11 @@ class ReplayBuffer:
     def __init__(self, capacity):
         self.buffer = deque(maxlen=capacity)
 
-        #saving expirience
+        #saving experience
     def push(self, state, action, reward, next_state, done): 
         self.buffer.append((state, action, reward, next_state, done))
 
-        #loading random sample of expirience for learning
+        #loading random sample of experience for learning
     def sample(self, batch_size):
         samples = random.sample(self.buffer, batch_size)
         states, action, reward, next_states, dones = zip(*samples)
