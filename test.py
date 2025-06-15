@@ -11,10 +11,9 @@ import os
 
 
 def test(model_path, episodes = 10):
-    env =    env = gym.make(ENV_NAME, continuous=CONTINUOUS, render_mode="human")
+    env = gym.make(ENV_NAME,max_episode_steps = 1500, continuous=CONTINUOUS, render_mode="human")
     agent = DQNAgent()
-    
-    if not os.path.exist(model_path):
+    if not os.path.exists(model_path):
         raise FileNotFoundError(f"Model file nod found!")
     
     print(f"Loading model from {model_path}")
@@ -48,4 +47,4 @@ def test(model_path, episodes = 10):
         print(f"Test Episode {episode + 1}, Reward: {total_reward:.2f}")
         
 if __name__ == "__main__":
-   test("models/dqn_car_final.pth")
+   test("models/dqn_episode_150.pth")

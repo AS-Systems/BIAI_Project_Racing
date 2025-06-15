@@ -75,32 +75,3 @@ class DQNAgent:
         self.policy_net.load_state_dict(torch.load(path))
         self.policy_net.eval()
         
-    def update_from_batch(self, batch):
-        states, actions, rewards, next_states, dones = batch
-        
-        states = torch.FloatTensor(np.array(states)).to(self.device)
-        actions = torch.FloatTensor(np.array(actions)).to(self.device)
-        rewards = torch.FloatTensor(np.array(rewards)).to(self.device)
-        next_states = torch.FloatTensor(np.array(next_states)).to(self.device)
-        dones = torch.FloatTensor(np.array(dones)).to(self.device)
-        
-        current_q = self.policy_net(states).gather(1, actions.unsqueeze(1))
-        
-        with torch.no_grad():
-            next_q = self.target_net(next_states).max(1)[0]
-            excepted_q = rewards + (1-dones) * GAMMA * next_q
-        
-        loss = torch.nn.MSELoss()(current_q.squeeze(), excepted_q)
-        
-        self.optimizer.zero_grad()
-        loss.backward()
-        self.optimizer.step()
-        
-        self.steps += 1
-        if self.steps % TARGET_UPDATE == 0:
-            self.target_net.load_state_dict(self.policy_net.state_dict())
-            
-        self.epsilon = max(EPSILON_MIN, self.epsilon* EPSILON_DECAY)
-        
-        return loss.item()
-        
