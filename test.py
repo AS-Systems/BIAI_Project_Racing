@@ -10,8 +10,8 @@ import os
 
 
 
-def test(model_path, episodes = 10):
-    env = gym.make(ENV_NAME,max_episode_steps = 1500, continuous=CONTINUOUS, render_mode="human")
+def test(model_path, episodes = 5):
+    env = gym.make(ENV_NAME, continuous=CONTINUOUS, render_mode="human")
     agent = DQNAgent()
     if not os.path.exists(model_path):
         raise FileNotFoundError(f"Model file nod found!")
