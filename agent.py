@@ -40,7 +40,7 @@ class DQNAgent:
         if len(self.memory) <  BATCH_SIZE:
             return 0.0
         
-        states, actions, rewards, next_states, dones = self.memory.sample(BATCH_SIZE)
+        states, actions, rewards, next_states, dones= self.memory.sample(BATCH_SIZE)
         
         states = torch.FloatTensor(states).to(self.device)
         actions = torch.LongTensor(actions).to(self.device)

@@ -9,15 +9,19 @@ from config import *
 from preprocesing import preprocess_frame, stac_frame
 from replay_buffer import ReplayBuffer
 from agent import DQNAgent   
-   
+from car_racing import CarRacing
     
 def train():
     print(f"Using device {DEVICE}")
-    env = gym.make(ENV_NAME,max_episode_steps = 1500, continuous=CONTINUOUS, render_mode = "human")
+
+    env = CarRacing(render_mode="human", continuous= CONTINUOUS)
     agent = DQNAgent()
         
     rewards_history = []
     for episode in range(EPISODES):
+        step_counter = 0
+        current_step = 0
+        current_reward_multiplayer = 1
         
         state, _ = env.reset()
         state = preprocess_frame(state)
@@ -31,18 +35,39 @@ def train():
             action_idx = agent.select_action(state_stac)
             action = ACTION_SPACE[action_idx] if not CONTINUOUS else None
             
-            next_state, reward, terminated, truncated, _ = env.step(
+            next_state, reward, terminated, truncated, info = env.step(
                     action_idx if not CONTINUOUS else action
                 )
-            done = terminated or truncated
+            done = terminated or truncated or step_counter == MAX_EPISODE_STEPS
             
             next_state = preprocess_frame(next_state)
             next_state_stack = stac_frame(state_stac, next_state)
             
-            agent.memory.push(state_stac, action_idx, reward, next_state_stack, done)
+            #reward modification
+            #speed
+            if current_step < 7:
+                current_step += 1
+                if reward > 0:
+                    current_reward_multiplayer += 0.15
+                    current_step = 0
+            else:
+                current_reward_multiplayer = 1
+                current_step = 0
+            
+            reward = reward * current_reward_multiplayer
+            
+            if env.tile_visited_count ==100:
+                reward += 100
+            elif env.tile_visited_count < 90:
+                reward *= 2
+            elif env.tile_visited_count < 80:
+                reward *= 1.5
+                
+            
+            agent.memory.push(state_stac, action_idx, reward, next_state_stack,terminated)
             
             loss = agent.update()
-            
+            step_counter += 1
             state_stac = next_state_stack
             total_reword+=reward
             if episode % LOG_INTERVAL == 0:

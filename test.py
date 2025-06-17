@@ -47,4 +47,4 @@ def test(model_path, episodes = 10):
         print(f"Test Episode {episode + 1}, Reward: {total_reward:.2f}")
         
 if __name__ == "__main__":
-   test("models/dqn_episode_150.pth")
+   test("models/dqn_final.pth")
